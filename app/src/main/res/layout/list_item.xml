@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/text_container"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_alignParentTop="true"
+    android:layout_alignParentBottom="true"
+    android:orientation="vertical"
+    android:paddingLeft="@dimen/base_padding"
+    android:paddingRight="@dimen/base_padding">
+
+    <TextView
+        android:id="@+id/title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="bottom"
+        android:paddingTop="@dimen/base_padding"
+        android:singleLine="true"
+        android:textAppearance="?android:textAppearanceMedium"
+        android:textSize="@dimen/base_text_size"
+        app:fontFamily="sans-serif-medium"
+        tools:text="Three men on Wheels" />
+
+    <TextView
+        android:id="@+id/price"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/title"
+        android:gravity="top"
+        android:textAppearance="?android:textAppearanceMedium"
+        android:textSize="@dimen/base_text_size"
+        app:fontFamily="sans-serif-light"
+        tools:text="$40.00" />
+
+    <RelativeLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/price">
+
+        <TextView
+            android:id="@+id/quantity"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignBaseline="@id/instock_label"
+            android:layout_alignBottom="@id/sale_btn"
+            android:textColor="@color/colorPrimary"
+            android:textSize="@dimen/large_text_size"
+            app:fontFamily="sans-serif-medium"
+            tools:text="10" />
+
+        <TextView
+            android:id="@+id/instock_label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignBottom="@id/sale_btn"
+            android:layout_toEndOf="@id/quantity"
+            android:layout_toRightOf="@id/quantity"
+            android:paddingHorizontal="@dimen/half_padding"
+            android:text="@string/in_stock"
+            android:textAllCaps="false"
+            android:textColor="@color/colorPrimary"
+            android:textSize="@dimen/small_text_size"
+            app:fontFamily="sans-serif-medium"
+            tools:text="psc" />
+
+        <TextView
+            android:id="@+id/outofstock_label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignBottom="@id/sale_btn"
+            android:text="@string/out_of_stock"
+            android:textAllCaps="true"
+            android:textColor="@color/colorAccent"
+            android:textSize="@dimen/small_text_size"
+            android:visibility="gone"
+            app:fontFamily="sans-serif-medium"
+            tools:text="out of stock" />
+
+        <Button
+            android:id="@+id/sale_btn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentRight="true"
+            android:focusable="false"
+            android:focusableInTouchMode="false"
+            android:text="@string/sale_button"
+            android:textAllCaps="true"
+            android:textSize="@dimen/button_text_size"
+            app:fontFamily="sans-serif-medium" />
+    </RelativeLayout>
+</RelativeLayout>
