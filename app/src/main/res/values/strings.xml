@@ -1,5 +1,72 @@
 <resources>
     <string name="app_name">InventoryApp</string>
-    <string name="action_settings">Settings</string>
-    <string name="books_table_entries">The books table contains %d entries.</string>
+
+    <!-- Menu options -->
+    <string name="action_insert_dummy_data">Insert Dummy Data</string>
+    <string name="action_delete_all_entries">Delete All Books</string>
+
+    <!-- Exception messages -->
+    <string name="cannot_query_unknown_uri">Cannot query unknown URI</string>
+    <string name="insert_not_supported">Insertion is not supported for</string>
+    <string name="failed_insert_book">Failed to insert row for</string>
+    <string name="exception_title_cant_be_null">Book requires a title</string>
+    <string name="exception_wrong_price">Book price should be greater than 0</string>
+    <string name="exception_wrong_quantity_value">Quantity can\'t be negative</string>
+    <string name="update_not_supported">Update is not supported for</string>
+    <string name="deletion_not_supported">Deletion is not supported for</string>
+
+    <string name="out_of_stock">Out of stock</string>
+    <string name="sale_button">Sale</string>
+    <string name="item_out_of_stock">Book is out of stock</string>
+    <string name="in_stock">pcs</string>
+
+    <!-- Text for the empty view -->
+    <string name="empty_view_title_text">Nothing here yet…</string>
+    <string name="empty_view_subtitle_text">Get started by adding a book</string>
+
+    <!-- Editor activity -->
+    <string name="book_overview">Book info</string>
+    <string name="hint_book_title">Book title</string>
+    <string name="hint_book_price">0.01</string>
+    <string name="hint_book_quantity">Qty</string>
+    <string name="category_supplier">Supplier info</string>
+    <string name="hint_supplier_name">Name</string>
+    <string name="hint_supplier_phone">Phone</string>
+    <string name="editor_activity_title_new_book">Add a book</string>
+    <string name="editor_activity_title_edit_book">Edit a book</string>
+    <string name="action_save">Save</string>
+    <string name="action_delete">Delete</string>
+
+    <!-- Dialog message when user is leaving editor but hasn't saved changes -->
+    <string name="unsaved_changes_dialog_msg">Discard your changes and quit editing?</string>
+    <string name="discard">Discard</string>
+    <string name="keep_editing">Keep Editing</string>
+
+    <!-- Dialog message to ask the user to confirm deleting the current book -->
+    <string name="delete_dialog_msg">Delete this pet?</string>
+    <string name="delete">Delete</string>
+    <string name="cancel">Cancel</string>
+
+    <!-- Toast message for successful operation result -->
+    <string name="editor_delete_book_successful">Book deleted</string>
+    <string name="editor_insert_book_successful">Book saved</string>
+    <string name="editor_update_book_successful">Book updated</string>
+
+    <!-- Toast message for failed operation result -->
+    <string name="editor_delete_book_failed">Error with deleting book</string>
+    <string name="editor_insert_book_failed">Error with saving book</string>
+    <string name="editor_update_book_failed">Error with updating book</string>
+
+    <!-- Validation messages -->
+    <string name="editor_cant_save_empty_item">Empty item can\'t be saved</string>
+    <string name="title_empty">Book title can\'t be empty</string>
+    <string name="price_empty">Price should be greater than 0</string>
+    <string name="quantity_empty">Quantity can\'t be empty</string>
+    <string name="supplier_empty">Supplier name can\'t be empty</string>
+    <string name="phone_empty">Phone number can\'t be empty</string>
+    <string name="call">Call</string>
+    <string name="plus">+</string>
+    <string name="minus">-</string>
+    <string name="stock_label">Stock</string>
+    <string name="price_label">Price</string>
 </resources>

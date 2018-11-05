@@ -1,104 +1,71 @@
 package com.example.julia.inventoryapp;
 
+import android.content.ContentUris;
 import android.content.ContentValues;
+import android.content.Intent;
 import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
+import android.net.Uri;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
+import android.support.v4.app.LoaderManager;
+import android.support.v4.content.CursorLoader;
+import android.support.v4.content.Loader;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
-import android.view.View;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.TextView;
+import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ListView;
 
 import com.example.julia.inventoryapp.data.BookContract.BookEntry;
-import com.example.julia.inventoryapp.data.BookContract.SupplierEntry;
-import com.example.julia.inventoryapp.data.BookDbHelper;
 
-public class CatalogActivity extends AppCompatActivity {
+public class CatalogActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor> {
 
-    private BookDbHelper mDbHelper;
+    private BookCursorAdapter mCursorAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_catalog);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                insertFakeData();
+                Intent intent = new Intent(CatalogActivity.this, EditorActivity.class);
+                startActivity(intent);
             }
         });
 
-        // To access our database, we instantiate our subclass of SQLiteOpenHelper
-        // and pass the context, which is the current activity.
-        mDbHelper = new BookDbHelper(this);
-        displayDatabaseInfo();
-    }
+        // Find ListView to populate
+        ListView bookListView = (ListView) findViewById(R.id.list_view);
 
-    /**
-     * Temporary helper method to display information in the onscreen TextView about the state of
-     * the pets database.
-     */
-    private void displayDatabaseInfo() {
+        // Find and set empty view on the ListView, so that it only shows when the list has 0 items.
+        View emptyView = findViewById(R.id.empty_view);
+        bookListView.setEmptyView(emptyView);
 
-        // Create and/or open a database to read from it
-        SQLiteDatabase db = mDbHelper.getReadableDatabase();
-        TextView displayView = (TextView) findViewById(R.id.text_view_book);
+        // Create an empty adapter we will use to display the loaded data.
+        mCursorAdapter = new BookCursorAdapter(this, null);
 
-        String rawQuery = "SELECT * FROM " + BookEntry.TABLE_NAME + " INNER JOIN " + SupplierEntry.TABLE_NAME +
-                " ON " + BookEntry.COLUMN_BOOK_SUPPLIER_ID + " = " + SupplierEntry.TABLE_NAME + "." + SupplierEntry._ID + ";";
+        bookListView.setAdapter(mCursorAdapter);
 
-        Cursor cursor = db.rawQuery(rawQuery, null);
+        bookListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Intent intent = new Intent(CatalogActivity.this, EditorActivity.class);
 
-        try {
-            displayView.setText(String.format(getString(R.string.books_table_entries) + "\n\n", cursor.getCount()));
-            displayView.append(BookEntry._ID + " - " +
-                    BookEntry.COLUMN_BOOK_TITLE + " - " +
-                    BookEntry.COLUMN_BOOK_PRICE + " - " +
-                    BookEntry.COLUMN_BOOK_CURRENCY + " - " +
-                    BookEntry.COLUMN_BOOK_QUANTITY + " - " +
-                    SupplierEntry.COLUMN_SUPPLIER_NAME + " - " +
-                    SupplierEntry.COLUMN_SUPPLIER_PHONE + "\n");
+                Uri uri = ContentUris.withAppendedId(BookEntry.CONTENT_URI, id);
+                intent.setData(uri);
+                startActivity(intent);
+            }
+        });
 
-            // Figure out the index of each column
-            int idColumnIndex = cursor.getColumnIndex(BookEntry._ID);
-            int titleColumnIndex = cursor.getColumnIndex(BookEntry.COLUMN_BOOK_TITLE);
-            int priceColumnIndex = cursor.getColumnIndex(BookEntry.COLUMN_BOOK_PRICE);
-            int currencyColumnIndex = cursor.getColumnIndex(BookEntry.COLUMN_BOOK_CURRENCY);
-            int quantityColumnIndex = cursor.getColumnIndex(BookEntry.COLUMN_BOOK_QUANTITY);
-            int supplierColumnIndex = cursor.getColumnIndex(SupplierEntry.COLUMN_SUPPLIER_NAME);
-            int supplierPhoneColumnIndex = cursor.getColumnIndex(SupplierEntry.COLUMN_SUPPLIER_PHONE);
-
-            // Iterate through all the returned rows in the cursor
-            while (cursor.moveToNext()) {
-                // Use that index to extract the String or Int value of the word
-                // at the current row the cursor is on.
-                int currentID = cursor.getInt(idColumnIndex);
-                String currentTitle = cursor.getString(titleColumnIndex);
-                Double currentPrice = cursor.getDouble(priceColumnIndex);
-                String currentCurrency = cursor.getString(currencyColumnIndex);
-                int currentQuantity = cursor.getInt(quantityColumnIndex);
-                String currentSupplier = cursor.getString(supplierColumnIndex);
-                String currentSupplierPhone = cursor.getString(supplierPhoneColumnIndex);
-                // Display the values from each column of the current row in the cursor in the TextView
-                displayView.append(("\n" + currentID + " - " +
-                        currentTitle + " - " +
-                        currentPrice + " - " +
-                        currentCurrency + " - " +
-                        currentQuantity + " - " +
-                        currentSupplier + " - " +
-                        currentSupplierPhone));
-            }       } finally {
-            // Always close the cursor when you're done reading from it. This releases all its
-            // resources and makes it invalid.
-            cursor.close();
-        }
+        // Prepare the loader.  Either re-connect with an existing one,
+        // or start a new one.
+        getSupportLoaderManager().initLoader(0, null, this);
     }
 
     @Override
@@ -110,39 +77,55 @@ public class CatalogActivity extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
+        // User clicked on a menu option in the app bar overflow menu
+        switch (item.getItemId()) {
+            // Respond to a click on the "Insert dummy data" menu option
+            case R.id.action_insert_dummy_data:
+                insertBook();
+                return true;
+            // Respond to a click on the "Delete all entries" menu option
+            case R.id.action_delete_all_entries:
+                int rowsDeleted = getContentResolver().delete(BookEntry.CONTENT_URI, null, null);
+                Log.v("CatalogActivity", rowsDeleted + " rows deleted from pet database");
+                return true;
         }
-
         return super.onOptionsItemSelected(item);
     }
 
-    private void insertFakeData(){
-        // Gets the data repository in write mode
-        SQLiteDatabase db = mDbHelper.getWritableDatabase();
-
-        ContentValues supplierValues = new ContentValues();
-        supplierValues.put(SupplierEntry.COLUMN_SUPPLIER_NAME, "Supplier Name");
-        supplierValues.put(SupplierEntry.COLUMN_SUPPLIER_PHONE, "123-456-789");
-
-        long newSupplierRowId = db.insert(SupplierEntry.TABLE_NAME, null, supplierValues);
-
+    private void insertBook(){
         // Create a new map of values, where column names are the keys
-        ContentValues bookValues = new ContentValues();
-        bookValues.put(BookEntry.COLUMN_BOOK_TITLE, "Alice in Wonderland");
-        bookValues.put(BookEntry.COLUMN_BOOK_PRICE, 20.50);
-        bookValues.put(BookEntry.COLUMN_BOOK_CURRENCY, "USD");
-        bookValues.put(BookEntry.COLUMN_BOOK_QUANTITY, 31);
-        bookValues.put(BookEntry.COLUMN_BOOK_SUPPLIER_ID, newSupplierRowId);
+        ContentValues values = new ContentValues();
+        values.put(BookEntry.COLUMN_BOOK_TITLE, "Alice in Wonderland");
+        values.put(BookEntry.COLUMN_BOOK_PRICE, 20.50);
+        values.put(BookEntry.COLUMN_BOOK_QUANTITY, 31);
+        values.put(BookEntry.COLUMN_SUPPLIER_NAME, "World's Book Supplier #1");
+        values.put(BookEntry.COLUMN_SUPPLIER_PHONE, "+122233344455");
 
-        // Insert the new row, returning the primary key value of the new row
-        long newBookRowId = db.insert(BookEntry.TABLE_NAME, null, bookValues);
-        displayDatabaseInfo();
+        getContentResolver().insert(BookEntry.CONTENT_URI, values);
+    }
+
+    @NonNull
+    @Override
+    public Loader<Cursor> onCreateLoader(int id, @Nullable Bundle args) {
+        String[] projection = {
+                BookEntry._ID,
+                BookEntry.COLUMN_BOOK_TITLE,
+                BookEntry.COLUMN_BOOK_PRICE,
+                BookEntry.COLUMN_BOOK_QUANTITY
+        };
+
+        Uri baseUri = BookEntry.CONTENT_URI;
+
+        return new CursorLoader(this, baseUri, projection, null, null, null);
+    }
+
+    @Override
+    public void onLoadFinished(@NonNull Loader<Cursor> loader, Cursor data) {
+        mCursorAdapter.swapCursor(data);
+    }
+
+    @Override
+    public void onLoaderReset(@NonNull Loader<Cursor> loader) {
+        mCursorAdapter.swapCursor(null);
     }
 }
